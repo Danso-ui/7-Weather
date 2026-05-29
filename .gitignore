@@ -1,0 +1,10 @@
+# Sensitive Information
+.env
+
+# Virtual Environments
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
