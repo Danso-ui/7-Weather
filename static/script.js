@@ -39,8 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
         form.submit();
       },
       (error) => {
-        // If the user denies permission, silently reset the button
-        console.warn("Location access denied or failed.");
+        // THE ERROR HANDLER: This alerts the user and resets the button!
+        alert(
+          "Location error: " +
+            error.message +
+            "\n\nPlease check your phone's browser settings to allow location access for this site.",
+        );
         locationBtn.innerHTML = originalText;
       },
     );
