@@ -1,14 +1,51 @@
 document.addEventListener("DOMContentLoaded", () => {
   const locationBtn = document.querySelector(".location-btn");
 
-  // This is the function that does the heavy lifting
+  // ==========================================
+  // 1. TEMPERATURE TOGGLE LOGIC
+  // ==========================================
+  const unitToggleBtn = document.getElementById("unit-toggle");
+  let isCelsius = true;
+
+  if (unitToggleBtn) {
+    unitToggleBtn.addEventListener("click", () => {
+      isCelsius = !isCelsius; // Flip the true/false state
+
+      // Update Main Temperature
+      const mainTemp = document.querySelector(".temp-display");
+      if (mainTemp) {
+        const cVal = parseFloat(mainTemp.getAttribute("data-celsius"));
+        const displayVal = isCelsius ? Math.round(cVal) : Math.round((cVal * 9/5) + 32);
+        mainTemp.innerHTML = `${displayVal}<sup>${isCelsius ? '°C' : '°F'}</sup>`;
+      }
+
+      // Update Feels Like Temperature
+      const feelsLine = document.querySelector(".feels-line");
+      if (feelsLine) {
+        const cVal = parseFloat(feelsLine.getAttribute("data-celsius"));
+        const displayVal = isCelsius ? Math.round(cVal) : Math.round((cVal * 9/5) + 32);
+        feelsLine.innerHTML = `Feels like ${displayVal}${isCelsius ? '°C' : '°F'}`;
+      }
+
+      // Update 6-Day Forecast List Temperatures
+      const forecastTemps = document.querySelectorAll(".forecast-temp");
+      forecastTemps.forEach(el => {
+        const cVal = parseFloat(el.getAttribute("data-celsius"));
+        const displayVal = isCelsius ? Math.round(cVal) : Math.round((cVal * 9/5) + 32);
+        el.innerHTML = `${displayVal}°`;
+      });
+    });
+  }
+
+  // ==========================================
+  // 2. GEOLOCATION LOCATION LOGIC
+  // ==========================================
   function getLocationAndSubmit() {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
       return;
     }
 
-    // Change text to show it is working
     const originalText = locationBtn.innerHTML;
     locationBtn.innerHTML = "Locating...";
 
@@ -17,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
 
-        // Dynamically create a hidden form and submit it to Flask
         const form = document.createElement("form");
         form.method = "POST";
         form.action = "/";
@@ -39,25 +75,19 @@ document.addEventListener("DOMContentLoaded", () => {
         form.submit();
       },
       (error) => {
-        // THE ERROR HANDLER: This alerts the user and resets the button!
-        alert(
-          "Location error: " +
-            error.message +
-            "\n\nPlease check your phone's browser settings to allow location access for this site.",
-        );
+        // Mobile alert helper
+        alert("Location error: " + error.message + "\n\nPlease check your phone's browser settings to allow location access for this site.");
         locationBtn.innerHTML = originalText;
-      },
+      }
     );
   }
 
-  // 1. Allow manual clicks just in case they want to refresh their location
+  // Attach click listener to the location button
   if (locationBtn) {
     locationBtn.addEventListener("click", getLocationAndSubmit);
   }
 
-  // 2. AUTO-RUN LOGIC
-  // We check if the '.city-name' div exists. If it DOES NOT exist,
-  // it means the user just opened the app, so we run the location function.
+  // Auto-run if opening the app fresh without a city loaded
   const weatherDataExists = document.querySelector(".city-name");
   if (!weatherDataExists) {
     getLocationAndSubmit();

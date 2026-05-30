@@ -13,6 +13,23 @@
   color: #e8f4fd;
   position: relative;
   overflow: hidden;
+  transition: background 0.8s ease;
+}
+/* Clear Day (Sky Blue) */
+.weather-wrap[data-theme="01d"] {
+  background: linear-gradient(160deg, #1e88e5 0%, #42a5f5 40%, #90caf9 100%);
+}
+/* Cloudy Day (Steel Blue) */
+.weather-wrap[data-theme="02d"], .weather-wrap[data-theme="03d"], .weather-wrap[data-theme="04d"] {
+  background: linear-gradient(160deg, #546e7a 0%, #78909c 40%, #90a4ae 100%);
+}
+/* Rain / Storms (Dark Slate) */
+.weather-wrap[data-theme^="09"], .weather-wrap[data-theme^="10"], .weather-wrap[data-theme^="11"] {
+  background: linear-gradient(160deg, #1c3144 0%, #274059 40%, #3f5e7a 100%);
+}
+/* Snow (Frosty Blue) */
+.weather-wrap[data-theme^="13"] {
+  background: linear-gradient(160deg, #78909c 0%, #90a4ae 40%, #b0bec5 100%);
 }
 button {
   -webkit-appearance: none;
@@ -272,4 +289,28 @@ button {
   .temp-display {
     font-size: 72px;
   }
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.top-controls .location-btn {
+  margin-bottom: 0; /* Override the old margin */
+}
+.unit-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  color: #e8f4fd;
+  font-size: 13px;
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.unit-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

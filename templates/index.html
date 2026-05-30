@@ -13,30 +13,33 @@
     <link rel="stylesheet" href="../static/style.css" />
   </head>
   <body>
-    <div class="weather-wrap">
+    <div class="weather-wrap" {% if current_weather %}data-theme="{{ current_weather.icon }}"{% endif %}>
+
       <form class="search-row" method="POST">
         <input type="text" name="city" id="search-bar" placeholder="Search city..." />
         <button type="submit">
-          <i class="ti ti-search" aria-hidden="true" style="font-size: 15px"></i>
-          Search
+          <i class="ti ti-search" aria-hidden="true" style="font-size: 15px"></i> Search
         </button>
       </form>
 
-      <button class="location-btn">
-        <i class="ti ti-current-location" aria-hidden="true" style="font-size: 15px"></i>
-        Use my current location
-      </button>
+      <div class="top-controls">
+        <button class="location-btn">
+          <i class="ti ti-current-location" aria-hidden="true" style="font-size: 15px"></i>
+          Use my current location
+        </button>
+
+        <button id="unit-toggle" class="unit-toggle">°C / °F</button>
+      </div>
 
       {% if current_weather %}
-
           <div class="city-name">{{ current_weather.timezone }}</div>
           <div class="date-line">{{ current_weather.day }} &nbsp;·&nbsp; {{ current_weather.time }}</div>
 
           <div class="main-temp-row">
             <div>
-              <div class="temp-display">{{ current_weather.temp | round | int }}<sup>°C</sup></div>
+              <div class="temp-display" data-celsius="{{ current_weather.temp }}">{{ current_weather.temp | round | int }}<sup>°C</sup></div>
               <div class="condition-label">{{ current_weather.description | title }}</div>
-              <div class="feels-line">Feels like {{ current_weather.feels_like | round | int }}°C</div>
+              <div class="feels-line" data-celsius="{{ current_weather.feels_like }}">Feels like {{ current_weather.feels_like | round | int }}°C</div>
             </div>
             <img src="{{ current_weather.icon_url }}" alt="Weather Icon" class="weather-icon-big" />
           </div>
@@ -65,13 +68,12 @@
             <div class="forecast-item">
               <div class="forecast-day">{{ day.day.split(',')[0][:3] }}</div>
               <img src="{{ day.icon_url }}" alt="icon" class="forecast-icon" />
-              <div class="forecast-temp">{{ day.temp | round | int }}°</div>
+              <div class="forecast-temp" data-celsius="{{ day.temp }}">{{ day.temp | round | int }}°</div>
             </div>
             {% endfor %}
           </div>
-
       {% endif %}
-      </div>
+    </div>
   </body>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </html>

@@ -65,6 +65,7 @@ def index():
                 "humidity": data2['current']['humidity'],  # -> %
                 "wind_speed": data2['current']['wind_speed'],  # -> m/s
                 "description": data2['current']['weather'][0]['description'],
+                "icon": current_icon_code,
                 "icon_url": f"https://openweathermap.org/img/wn/{current_icon_code}@2x.png",
                 "pressure": data2['current']['pressure'],
                 "feels_like": data2['current']['feels_like'],
