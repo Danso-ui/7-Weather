@@ -1,7 +1,7 @@
 import os
 import requests as r
 from dotenv import load_dotenv
-from datetime import datetime as dt
+from datetime import datetime as dt, timezone
 from flask import Flask, render_template, request
 
 load_dotenv()
@@ -70,8 +70,8 @@ def index():
                 "pressure": data2['current']['pressure'],
                 "feels_like": data2['current']['feels_like'],
                 "timezone": data2['timezone'].split("/")[1].replace("_", " "),
-                "day": dt.fromtimestamp(data2['current']['dt']).strftime("%A, %b %d %Y"),
-                "time": dt.fromtimestamp(data2['current']['dt']).strftime("%I:%M %p")
+                "day": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%A, %b %d %Y"),
+                "time": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%I:%M %p")
             }
 
             # Build forecast list (0 to 7 = Today + 6 future days)
@@ -84,7 +84,7 @@ def index():
                     "wind_speed": data2['daily'][i]['wind_speed'],  # -> m/s
                     "description": data2['daily'][i]['weather'][0]['description'],
                     "icon_url": f"https://openweathermap.org/img/wn/{daily_icon_code}@2x.png",
-                    "day": dt.fromtimestamp(data2['daily'][i]['dt']).strftime("%A, %b %d %Y")
+                    "day": dt.fromtimestamp(data2['daily'][i]['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%A, %b %d %Y")
                 }
                 forecast.append(day_data)
 
