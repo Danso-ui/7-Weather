@@ -3,7 +3,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap");
 .weather-wrap {
   font-family: "DM Sans", sans-serif;
@@ -15,7 +14,6 @@
   position: relative;
   overflow: hidden;
 }
-
 button {
   -webkit-appearance: none;
   appearance: none;
@@ -24,7 +22,6 @@ button {
   border: none;
   outline: none;
 }
-
 .weather-wrap::before {
   content: "";
   position: absolute;
@@ -190,11 +187,9 @@ button {
   text-transform: uppercase;
 }
 .forecast-strip {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* This forces exactly 7 equal columns */
+  gap: 10px; /* Adjust this gap if they look too squeezed */
 }
 .forecast-strip::-webkit-scrollbar {
   display: none;
@@ -203,10 +198,9 @@ button {
   flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.04);
   border: 0.5px solid rgba(255, 255, 255, 0.07);
-  border-radius: var(--border-radius-md);
   padding: 0.7rem 0.9rem;
   text-align: center;
-  min-width: 72px;
+  min-width: 0;
 }
 .forecast-item.active {
   background: rgba(56, 189, 248, 0.12);

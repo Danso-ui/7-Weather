@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>7 Weather</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌤️</text></svg>"/>
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
@@ -12,108 +14,64 @@
   </head>
   <body>
     <div class="weather-wrap">
-      <form class="search-row">
-        <input
-          type="text"
-          name="search-bar"
-          id="search-bar"
-          placeholder="Search city..."
-        />
+      <form class="search-row" method="POST">
+        <input type="text" name="city" id="search-bar" placeholder="Search city..." />
         <button type="submit">
-          <i
-            class="ti ti-search"
-            aria-hidden="true"
-            style="font-size: 15px"
-          ></i>
+          <i class="ti ti-search" aria-hidden="true" style="font-size: 15px"></i>
           Search
         </button>
       </form>
 
       <button class="location-btn">
-        <i
-          class="ti ti-current-location"
-          aria-hidden="true"
-          style="font-size: 15px"
-        ></i>
+        <i class="ti ti-current-location" aria-hidden="true" style="font-size: 15px"></i>
         Use my current location
       </button>
 
-      <div class="city-name">{{Kumasi}}</div>
-      <div class="date-line">{{Friday, 29 May 2026}} &nbsp;·&nbsp; {{10:42 AM}}</div>
+      {% if current_weather %}
 
-      <div class="main-temp-row">
-        <div>
-          <div class="temp-display">{{28}}<sup>°C</sup></div>
-          <div class="condition-label">{{Partly Cloudy}}</div>
-          <div class="feels-line">Feels like {{31}}°C</div>
-        </div>
-        <div class="weather-icon-big">{{⛅}}</div>
-      </div>
+          <div class="city-name">{{ current_weather.timezone }}</div>
+          <div class="date-line">{{ current_weather.day }} &nbsp;·&nbsp; {{ current_weather.time }}</div>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="ti ti-droplet" aria-hidden="true"></i>
+          <div class="main-temp-row">
+            <div>
+              <div class="temp-display">{{ current_weather.temp | round | int }}<sup>°C</sup></div>
+              <div class="condition-label">{{ current_weather.description | title }}</div>
+              <div class="feels-line">Feels like {{ current_weather.feels_like | round | int }}°C</div>
+            </div>
+            <img src="{{ current_weather.icon_url }}" alt="Weather Icon" class="weather-icon-big" />
           </div>
-          <div class="stat-value">{{74}}%</div>
-          <div class="stat-label">Humidity</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="ti ti-wind" aria-hidden="true"></i>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="ti ti-droplet" aria-hidden="true"></i></div>
+              <div class="stat-value">{{ current_weather.humidity }}%</div>
+              <div class="stat-label">Humidity</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="ti ti-wind" aria-hidden="true"></i></div>
+              <div class="stat-value">{{ current_weather.wind_speed }} m/s</div>
+              <div class="stat-label">Wind</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="ti ti-gauge" aria-hidden="true"></i></div>
+              <div class="stat-value">{{ current_weather.pressure }} hPa</div>
+              <div class="stat-label">Pressure</div>
+            </div>
           </div>
-          <div class="stat-value">{{14}} km/h</div>
-          <div class="stat-label">Wind</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="ti ti-gauge" aria-hidden="true"></i>
+
+          <div class="section-label">6-day forecast</div>
+          <div class="forecast-strip">
+            {% for day in forecast %}
+            <div class="forecast-item">
+              <div class="forecast-day">{{ day.day.split(',')[0][:3] }}</div>
+              <img src="{{ day.icon_url }}" alt="icon" class="forecast-icon" />
+              <div class="forecast-temp">{{ day.temp | round | int }}°</div>
+            </div>
+            {% endfor %}
           </div>
-          <div class="stat-value">{{1012}} hPa</div>
-          <div class="stat-label">Pressure</div>
-        </div>
+
+      {% endif %}
       </div>
-
-      <div class="section-label">5-day forecast</div>
-      <div class="forecast-strip">
-        {{ for day in days}}
-        <div class="forecast-strip">
-          <div class="forecast-day">{{ day.day }}</div>
-          <img src="{{day.link}}" alt="icon" class="forecast-icon" />
-          <div class="forecast-temp">{{ day.temp }}°</div>
-        </div>
-        {{ end for }}
-
-        <div class="forecast-item active">
-          <div class="forecast-day">Today</div>
-          <div class="forecast-icon">⛅</div>
-          <div class="forecast-temp">28°</div>
-        </div>
-
-        <div class="forecast-item">
-          <div class="forecast-day">Sat</div>
-          <div class="forecast-icon">🌧️</div>
-          <div class="forecast-temp">25°</div>
-        </div>
-
-        <div class="forecast-item">
-          <div class="forecast-day">Sun</div>
-          <div class="forecast-icon">⛈️</div>
-          <div class="forecast-temp">24°</div>
-        </div>
-
-        <div class="forecast-item">
-          <div class="forecast-day">Mon</div>
-          <div class="forecast-icon">🌤️</div>
-          <div class="forecast-temp">29°</div>
-        </div>
-
-        <div class="forecast-item">
-          <div class="forecast-day">Tue</div>
-          <div class="forecast-icon">☀️</div>
-          <div class="forecast-temp">31°</div>
-        </div>
-      </div>
-    </div>
   </body>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </html>
