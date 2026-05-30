@@ -29,14 +29,11 @@ def index():
 
         # --- SCENARIO A: The user used the search bar ---
         if city:
-            url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={key}&units=metric"
-            response = r.get(url)
-
-            # Only proceed if the API actually found the city (Status 200)
-            if response.status_code == 200:
-                data = response.json()
-                longitude = data["coord"]["lon"]
-                latitude = data["coord"]["lat"]
+            geo_url = f"https://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={key}"
+            geo = r.get(geo_url).json()
+            if geo:
+                latitude = geo[0]["lat"]
+                longitude = geo[0]["lon"]
 
         # --- SCENARIO B: The user clicked "Use my current location" ---
         elif lat and lon:
@@ -44,9 +41,7 @@ def index():
             longitude = lon
 
         # --- FINAL STEP: If we successfully got coordinates from either A or B ---
-        if latitude and longitude:
-
-            # Fetch OneCall Data
+        if latitude is not None and longitude is not None:
             url2 = "https://api.openweathermap.org/data/3.0/onecall"
             params = {
                 "lat": latitude,
@@ -55,38 +50,40 @@ def index():
                 "units": "metric"
             }
             response2 = r.get(url2, params=params)
-            data2 = response2.json()
 
-            # Build current_weather dictionary
-            current_icon_code = data2['current']['weather'][0]['icon']
+            if response2.status_code == 200:
+                data2 = response2.json()
 
-            current_weather = {
-                "temp": data2['current']['temp'],  # ->℃
-                "humidity": data2['current']['humidity'],  # -> %
-                "wind_speed": data2['current']['wind_speed'],  # -> m/s
-                "description": data2['current']['weather'][0]['description'],
-                "icon": current_icon_code,
-                "icon_url": f"https://openweathermap.org/img/wn/{current_icon_code}@2x.png",
-                "pressure": data2['current']['pressure'],
-                "feels_like": data2['current']['feels_like'],
-                "timezone": data2['timezone'].split("/")[1].replace("_", " "),
-                "day": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%A, %b %d %Y"),
-                "time": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%I:%M %p")
-            }
+                current_icon_code = data2['current']['weather'][0]['icon']
 
-            # Build forecast list (0 to 7 = Today + 6 future days)
-            for i in range(1, 7):
-                daily_icon_code = data2['daily'][i]['weather'][0]['icon']
-
-                day_data = {
-                    "temp": data2['daily'][i]['temp']['day'],  # -> ℃
-                    "humidity": data2['daily'][i]['humidity'],  # -> %
-                    "wind_speed": data2['daily'][i]['wind_speed'],  # -> m/s
-                    "description": data2['daily'][i]['weather'][0]['description'],
-                    "icon_url": f"https://openweathermap.org/img/wn/{daily_icon_code}@2x.png",
-                    "day": dt.fromtimestamp(data2['daily'][i]['dt'] + data2['timezone_offset'], tz=timezone.utc).strftime("%A, %b %d %Y")
+                current_weather = {
+                    "temp": data2['current']['temp'],
+                    "humidity": data2['current']['humidity'],
+                    "wind_speed": data2['current']['wind_speed'],
+                    "description": data2['current']['weather'][0]['description'],
+                    "icon": current_icon_code,
+                    "icon_url": f"https://openweathermap.org/img/wn/{current_icon_code}@2x.png",
+                    "pressure": data2['current']['pressure'],
+                    "feels_like": data2['current']['feels_like'],
+                    "timezone": data2['timezone'].split("/")[1].replace("_", " "),
+                    "day": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'],
+                                            tz=timezone.utc).strftime("%A, %b %d %Y"),
+                    "time": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'],
+                                             tz=timezone.utc).strftime("%I:%M %p")
                 }
-                forecast.append(day_data)
+
+                for i in range(1, 7):
+                    daily_icon_code = data2['daily'][i]['weather'][0]['icon']
+                    day_data = {
+                        "temp": data2['daily'][i]['temp']['day'],
+                        "humidity": data2['daily'][i]['humidity'],
+                        "wind_speed": data2['daily'][i]['wind_speed'],
+                        "description": data2['daily'][i]['weather'][0]['description'],
+                        "icon_url": f"https://openweathermap.org/img/wn/{daily_icon_code}@2x.png",
+                        "day": dt.fromtimestamp(data2['daily'][i]['dt'] + data2['timezone_offset'],
+                                                tz=timezone.utc).strftime("%A, %b %d %Y")
+                    }
+                    forecast.append(day_data)
 
     # Render the HTML page, passing the data along!
     return render_template("index.html", current_weather=current_weather, forecast=forecast)
