@@ -13,19 +13,18 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # 1. Initialize as None/Empty so the page loads cleanly on a GET request
     current_weather = None
     forecast = []
+    error_message = None  # <--- 1. Create a blank error message variable
 
     if request.method == "POST":
-        # Capture form data (might be city, might be lat/lon)
         city = request.form.get("city")
         lat = request.form.get("lat")
         lon = request.form.get("lon")
 
-        # Set these up to be filled in by one of the scenarios below
         latitude = None
         longitude = None
+        location_name = None
 
         # --- SCENARIO A: The user used the search bar ---
         if city:
@@ -34,13 +33,23 @@ def index():
             if geo:
                 latitude = geo[0]["lat"]
                 longitude = geo[0]["lon"]
+                location_name = f"{geo[0]['name']}, {geo[0]['country']}"
+            else:
+                # <--- 2. If 'geo' is empty, set the error message!
+                error_message = f"Could not find '{city}'. Please check your spelling and try again."
 
         # --- SCENARIO B: The user clicked "Use my current location" ---
         elif lat and lon:
             latitude = lat
             longitude = lon
+            rev_geo_url = f"https://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={key}"
+            rev_geo = r.get(rev_geo_url).json()
+            if rev_geo:
+                location_name = f"{rev_geo[0]['name']}, {rev_geo[0]['country']}"
+            else:
+                location_name = "Current Location"
 
-        # --- FINAL STEP: If we successfully got coordinates from either A or B ---
+        # --- FINAL STEP: Fetch Weather ---
         if latitude is not None and longitude is not None:
             url2 = "https://api.openweathermap.org/data/3.0/onecall"
             params = {
@@ -65,7 +74,9 @@ def index():
                     "icon_url": f"https://openweathermap.org/img/wn/{current_icon_code}@2x.png",
                     "pressure": data2['current']['pressure'],
                     "feels_like": data2['current']['feels_like'],
-                    "timezone": data2['timezone'].split("/")[1].replace("_", " "),
+
+                    "city_name": location_name,
+
                     "day": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'],
                                             tz=timezone.utc).strftime("%A, %b %d %Y"),
                     "time": dt.fromtimestamp(data2['current']['dt'] + data2['timezone_offset'],
@@ -86,8 +97,7 @@ def index():
                     forecast.append(day_data)
 
     # Render the HTML page, passing the data along!
-    return render_template("index.html", current_weather=current_weather, forecast=forecast)
-
+    return render_template("index.html", current_weather=current_weather, forecast=forecast, error_message=error_message)
 
 if __name__ == "__main__":
     app.run(debug=False)

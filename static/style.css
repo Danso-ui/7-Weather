@@ -6,7 +6,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap");
 .weather-wrap {
   font-family: "DM Sans", sans-serif;
-  min-height: 600px;
+  min-height: 100vh;
   background: linear-gradient(160deg, #0a1628 0%, #0d2444 40%, #0f3460 100%);
   /* border-radius: 12px; */
   padding: 2rem;

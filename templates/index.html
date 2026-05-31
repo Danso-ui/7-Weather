@@ -15,12 +15,21 @@
   <body>
     <div class="weather-wrap" {% if current_weather %}data-theme="{{ current_weather.icon }}"{% endif %}>
 
-      <form class="search-row" method="POST">
-        <input type="text" name="city" id="search-bar" placeholder="Search city..." />
+      <form class="search-row" method="POST" style="margin-bottom: 0.5rem;">
+        <input type="text" name="city" id="search-bar" placeholder="Enter a city (e.g., Kumasi, Tokyo)..." required />
         <button type="submit">
           <i class="ti ti-search" aria-hidden="true" style="font-size: 15px"></i> Search
         </button>
       </form>
+      <div style="font-size: 11px; color: rgba(232, 244, 253, 0.4); margin-bottom: 2rem; padding-left: 1rem;">
+        * For best results, search for a specific city, not a country.
+      </div>
+
+      {% if error_message %}
+      <div id="error-box" style="color: #fca5a5; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.75rem; border-radius: 8px; margin-bottom: 2rem; font-size: 13px; text-align: center;">
+        <i class="ti ti-alert-circle" style="vertical-align: middle; margin-right: 4px;"></i> {{ error_message }}
+      </div>
+      {% endif %}
 
       <div class="top-controls">
         <button class="location-btn">
@@ -32,7 +41,7 @@
       </div>
 
       {% if current_weather %}
-          <div class="city-name">{{ current_weather.timezone }}</div>
+          <div class="city-name">{{ current_weather.city_name }}</div>
           <div class="date-line">{{ current_weather.day }} &nbsp;·&nbsp; {{ current_weather.time }}</div>
 
           <div class="main-temp-row">

@@ -89,7 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Auto-run if opening the app fresh without a city loaded
   const weatherDataExists = document.querySelector(".city-name");
-  if (!weatherDataExists) {
+  const errorBoxExists = document.getElementById("error-box");
+
+  // ONLY run the location finder if there is no weather data AND no error message
+  if (!weatherDataExists && !errorBoxExists) {
     getLocationAndSubmit();
   }
 });
